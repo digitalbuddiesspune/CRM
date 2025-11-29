@@ -10,10 +10,10 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-
+app.use(cors());
 // Middleware
 app.use(express.json());
-app.use(cors());
+
 
 // Routes
 app.use('/api/v1', clientRouter);
