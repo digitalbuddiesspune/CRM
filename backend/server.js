@@ -10,7 +10,12 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-app.use(cors());
+app.use(cors({
+  origin: ["https://dmcrms.in", "http://localhost:5173", "http://localhost:3000"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false        // change to true if using cookies/auth
+}));
 // Middleware
 app.use(express.json());
 
