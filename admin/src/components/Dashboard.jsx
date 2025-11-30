@@ -3,6 +3,7 @@ import axios from 'axios';
 import AddLeadForm from './AddLeadForm';
 import EditLeadForm from './EditLeadForm';
 import Footer from './Footer';
+import logoImage from '../assets/width_800.webp';
 
 
 const Dashboard = ({ apiUrl }) => {
@@ -158,29 +159,36 @@ const Dashboard = ({ apiUrl }) => {
     <div className=" bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">CRM Dashboard</h1>
-              <p className="mt-2 text-sm text-blue-100 font-medium">Digital Buddiess - Leads Management</p>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
+              <img 
+                src={logoImage} 
+                alt="Digital Buddiess Logo" 
+                className="h-10 sm:h-12 w-auto object-contain flex-shrink-0"
+              />
+              <div>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">CRM Dashboard</h1>
+                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-blue-100 font-medium">Digital Buddiess - Leads Management</p>
+              </div>
             </div>
             <button
               onClick={() => setShowAddForm(true)}
-              className="px-6 py-2 bg-white bg-opacity-20 backdrop-blur-sm text-black hover:cursor-pointer hover:translate-y-[-2px] rounded-md hover:bg-opacity-30 transition-colors font-medium shadow-sm flex items-center space-x-2 border border-white border-opacity-30"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-white bg-opacity-20 backdrop-blur-sm text-white sm:text-black hover:cursor-pointer hover:translate-y-[-2px] rounded-md hover:bg-opacity-30 transition-colors font-medium shadow-sm flex items-center justify-center space-x-2 border border-white border-opacity-30"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              <span>Add Lead</span>
+              <span className="text-sm sm:text-base">Add Lead</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-8">
         {/* Statistics Cards */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div className="bg-gray-100 rounded-lg shadow p-6 border border-gray-200">
               <div className="text-sm font-medium text-gray-600">Total Leads</div>
               <div className="mt-2 text-3xl font-bold text-gray-800">{stats.totalLeads}</div>
@@ -196,8 +204,8 @@ const Dashboard = ({ apiUrl }) => {
         )}
 
         {/* Filters */}
-        <div className="bg-gray-50 rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-gray-50 rounded-lg shadow p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Filter by Date
@@ -274,8 +282,8 @@ const Dashboard = ({ apiUrl }) => {
 
                 return (
                   <div key={date} className="bg-gray-50 rounded-lg shadow overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-6 py-4">
-                      <h2 className="text-xl font-bold text-white">
+                    <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4">
+                      <h2 className="text-lg sm:text-xl font-bold text-white">
                         {new Date(date).toLocaleDateString('en-US', {
                           weekday: 'long',
                           year: 'numeric',
@@ -283,12 +291,12 @@ const Dashboard = ({ apiUrl }) => {
                           day: 'numeric'
                         })}
                       </h2>
-                      <p className="text-blue-100 mt-1">
+                      <p className="text-blue-100 mt-1 text-sm sm:text-base">
                         {dateLeads.length} lead{dateLeads.length !== 1 ? 's' : ''} generated
                       </p>
                     </div>
 
-                    <div className="p-6">
+                    <div className="p-4 sm:p-6">
                       {Object.entries(employeeGroups).map(([employeeName, empLeads]) => (
                         <div key={employeeName} className="mb-6 last:mb-0">
                           <div className="flex items-center mb-4 pb-2 border-b">
@@ -305,15 +313,15 @@ const Dashboard = ({ apiUrl }) => {
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                             {empLeads.map((lead) => (
                               <div
                                 key={lead._id || lead.id}
-                                className="bg-gray-100 border border-gray-300 rounded-lg p-4 hover:shadow-md transition relative"
+                                className="bg-gray-100 border border-gray-300 rounded-lg p-3 sm:p-4 hover:shadow-md transition relative"
                               >
-                                <div className="flex items-start justify-between mb-2">
-                                  <h4 className="font-semibold text-gray-900">{lead.clientName || 'N/A'}</h4>
-                                  <div className="flex items-center space-x-2">
+                                <div className="flex items-start justify-between mb-2 gap-2">
+                                  <h4 className="font-semibold text-gray-900 text-sm sm:text-base flex-1 break-words">{lead.clientName || 'N/A'}</h4>
+                                  <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
                                     <span className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(lead.status)}`}>
                                       {lead.status}
                                     </span>
@@ -364,38 +372,38 @@ const Dashboard = ({ apiUrl }) => {
           </div>
         ) : (
           <div className="bg-gray-50 rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                       Employee
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Company
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Contact
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                      Business Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Email
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                      Location
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Source
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                      Time
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                       NFD
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                       NFD Updated
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -403,7 +411,7 @@ const Dashboard = ({ apiUrl }) => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {leads.length === 0 ? (
                     <tr>
-                      <td colSpan="10" className="px-6 py-4 text-center text-gray-500">
+                      <td colSpan="10" className="px-3 sm:px-6 py-4 text-center text-gray-500 text-sm">
                         No leads found
                       </td>
                     </tr>
@@ -412,52 +420,58 @@ const Dashboard = ({ apiUrl }) => {
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .map((lead) => (
                         <tr key={lead._id || lead.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
+                            <div className="sm:hidden font-medium mb-1">Date:</div>
                             {new Date(lead.date).toLocaleDateString()}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900 hidden sm:table-cell">
                             {lead.generatedBy || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
+                            <div className="sm:hidden font-medium mb-1">Company:</div>
                             {lead.clientName || 'N/A'}
+                            <div className="sm:hidden text-xs text-gray-500 mt-1 space-y-1">
+                              <div>Employee: {lead.generatedBy || 'N/A'}</div>
+                              <div>Type: {lead.businessType || 'N/A'}</div>
+                            </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">
                             {lead.businessType || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
                             {lead.location || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
                             {lead.time || 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                             <span className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(lead.status)}`}>
                               {lead.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">
                             {lead.nfd ? formatDate(lead.nfd) : 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
                             {lead.nfdUpdatedDay ? formatDate(lead.nfdUpdatedDay) : 'N/A'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div className="flex items-center space-x-2">
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex items-center space-x-1 sm:space-x-2">
                               <button
                                 onClick={() => setEditingLead(lead)}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="text-blue-600 hover:text-blue-900 p-1"
                                 title="Edit Lead"
                               >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                               </button>
                               <button
                                 onClick={() => handleDeleteLead(lead._id || lead.id)}
-                                className="text-red-600 hover:text-red-900"
+                                className="text-red-600 hover:text-red-900 p-1"
                                 title="Delete Lead"
                               >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>

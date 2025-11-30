@@ -72,16 +72,16 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-50 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-gray-50 rounded-lg shadow-xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-6 py-4 rounded-t-lg">
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              <h2 className="text-2xl font-bold text-white">Edit Lead</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-white">Edit Lead</h2>
             </div>
             <button
               onClick={onClose}
@@ -95,7 +95,7 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 bg-gray-50">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-gray-50">
           {/* Success Message */}
           {success && (
             <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
@@ -193,7 +193,7 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
           </div>
 
           {/* Date and Time Row */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -230,7 +230,7 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               NFD - Next Follow Up Date
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="date"
                 name="nfd"
@@ -250,11 +250,11 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-4 pt-4 border-t">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors text-sm sm:text-base"
               disabled={loading}
             >
               Cancel
@@ -262,7 +262,7 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-md hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-md hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {loading ? 'Updating...' : 'Update Lead'}
             </button>
