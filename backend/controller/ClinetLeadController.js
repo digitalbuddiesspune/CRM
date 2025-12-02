@@ -3,7 +3,7 @@ import ClientLead from '../model/ClientLead.js';
 // Add a new client lead
 export const addClientLead = async (req, res) => {
   try {
-    const { clientName, businessType, location, generatedBy, date, time, status, nfd } = req.body;
+    const { clientName, clientNumber, businessType, location, requirement, generatedBy, date, time, status, nfd } = req.body;
     if (!clientName || !businessType || !location || !generatedBy || !date || !time || !status) {
       return res.status(400).json({
         success: false,
@@ -14,8 +14,10 @@ export const addClientLead = async (req, res) => {
     // Create new lead
     const newLead = new ClientLead({
       clientName,
+      clientNumber: clientNumber || null,
       businessType,
       location,
+      requirement: requirement || null,
       generatedBy,
       date,
       time,
@@ -140,7 +142,7 @@ export const getLeadsByEmployeeQuery = async (req, res) => {
 export const updateClientLead = async (req, res) => {
   try {
     const { id } = req.params;
-    const { clientName, businessType, location, generatedBy, date, time, status, nfd } = req.body;
+    const { clientName, clientNumber, businessType, location, requirement, generatedBy, date, time, status, nfd } = req.body;
 
     if (!id) {
       return res.status(400).json({
@@ -152,8 +154,10 @@ export const updateClientLead = async (req, res) => {
     // Build update object
     const updateData = {};
     if (clientName) updateData.clientName = clientName;
+    if (clientNumber !== undefined) updateData.clientNumber = clientNumber || null;
     if (businessType) updateData.businessType = businessType;
     if (location) updateData.location = location;
+    if (requirement !== undefined) updateData.requirement = requirement || null;
     if (generatedBy) updateData.generatedBy = generatedBy;
     if (date) updateData.date = date;
     if (time) updateData.time = time;

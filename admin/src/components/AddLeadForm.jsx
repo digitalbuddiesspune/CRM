@@ -1,29 +1,44 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
-    clientName: '',
-    businessType: '',
-    location: '',
-    generatedBy: '',
-    status: 'Pending',
-    date: new Date().toISOString().split('T')[0],
+    clientName: "",
+    clientNumber: "",
+    businessType: "",
+    location: "",
+    requirement: "",
+    generatedBy: "",
+    status: "Pending",
+    date: new Date().toISOString().split("T")[0],
     time: new Date().toTimeString().slice(0, 5), // HH:MM format
-    nfd: '' // Next Follow Up Date
+    nfd: "", // Next Follow Up Date
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const statusOptions = ['Pending', 'In Progress', 'Completed', 'Cancelled', 'Approved', 'Rejected'];
+  const statusOptions = [
+    "Pending",
+    "In Progress",
+    "Completed",
+    "Cancelled",
+    "Approved",
+    "Rejected",
+    "Not Interested",
+    "Follow Up",
+    "Busy",
+    "Call Later",
+    "Meeting Scheduled",
+    "Not Answering",
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -35,7 +50,7 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
 
     try {
       const response = await axios.post(`${apiUrl}/add-client-lead`, formData);
-      
+
       if (response.data.success) {
         setSuccess(true);
         setTimeout(() => {
@@ -44,8 +59,10 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
         }, 1500);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add lead. Please try again.');
-      console.error('Error adding lead:', err);
+      setError(
+        err.response?.data?.message || "Failed to add lead. Please try again."
+      );
+      console.error("Error adding lead:", err);
     } finally {
       setLoading(false);
     }
@@ -57,20 +74,35 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4 rounded-t-lg">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl sm:text-2xl font-bold text-white">Add New Lead</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white">
+              Add New Lead
+            </h2>
             <button
               onClick={onClose}
               className="text-white hover:text-gray-200 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-gray-50">
+        <form
+          onSubmit={handleSubmit}
+          className="p-4 sm:p-6 space-y-4 sm:space-y-6 bg-gray-50"
+        >
           {/* Success Message */}
           {success && (
             <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
@@ -97,10 +129,24 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., TechnoEdge Solutions, Priya Sharma"
+              placeholder="e.g. TechnoEdge Solutions, Priya Sharma"
             />
           </div>
-
+          {/* Client Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Number
+            </label>
+            <input
+              type="text"
+              name="clientNumber"
+              value={formData.clientNumber}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. +91 98765 43210"
+            />
+          </div>
           {/* Business Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -113,10 +159,9 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., IT Services"
+              placeholder="e.g. IT Services"
             />
           </div>
-
           {/* Location */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -129,14 +174,30 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., Mumbai, Maharashtra"
+              placeholder="e.g. Mumbai, Maharashtra"
+            />
+          </div>
+          {/* Requirement */}
+           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Requirement <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="requirement"
+              value={formData.requirement}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="e.g. Digital Marketing, Website Development, SEO Services, etc."
             />
           </div>
 
           {/* Generated By */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Generated By (Employee Name) <span className="text-red-500">*</span>
+              Generated By (Employee Name){" "}
+              <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -145,7 +206,7 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., Nikhil Mathure"
+              placeholder="e.g. Nikhil Mathure"
             />
           </div>
 
@@ -161,8 +222,10 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              {statusOptions.map(status => (
-                <option key={status} value={status}>{status}</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
               ))}
             </select>
           </div>
@@ -216,7 +279,7 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               />
               <input
                 type="text"
-                value={formData.nfd || ''}
+                value={formData.nfd || ""}
                 readOnly
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600"
                 placeholder="Selected date will appear here"
@@ -239,7 +302,7 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
               disabled={loading}
               className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-md hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
-              {loading ? 'Adding...' : 'Add Lead'}
+              {loading ? "Adding..." : "Add Lead"}
             </button>
           </div>
         </form>
@@ -249,8 +312,3 @@ const AddLeadForm = ({ apiUrl, onClose, onSuccess }) => {
 };
 
 export default AddLeadForm;
-
-
-
-
-

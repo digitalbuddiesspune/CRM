@@ -25,21 +25,23 @@ const Dashboard = ({ apiUrl }) => {
       // Handle the API response structure: { success, count, data }
       if (response.data.success && response.data.data) {
         // Map the API data to match the dashboard structure
-        const mappedLeads = response.data.data.map((lead) => ({
-          id: lead._id || lead.id,
-          companyName: lead.clientName || "N/A", // Business Name
-          contactName: lead.clientName || "N/A", // Client Name (same as clientName for now)
-          clientName: lead.clientName || "N/A", // Preserve original clientName
-          businessType: lead.businessType || "N/A",
-          location: lead.location || "N/A",
-          employeeName: lead.generatedBy || "N/A", // Map generatedBy to employeeName
-          status: lead.status || "N/A",
-          date: lead.date || new Date().toISOString().split("T")[0],
-          time: lead.time || "",
-          createdAt: lead.createdAt,
-          nfd: lead.nfd || null,
-          nfdUpdatedDay: lead.nfdUpdatedDay || null,
-        }));
+         const mappedLeads = response.data.data.map((lead) => ({
+           id: lead._id || lead.id,
+           companyName: lead.clientName || "N/A", // Business Name
+           contactName: lead.clientName || "N/A", // Client Name (same as clientName for now)
+           clientName: lead.clientName || "N/A", // Preserve original clientName
+           clientNumber: lead.clientNumber || null,
+           businessType: lead.businessType || "N/A",
+           location: lead.location || "N/A",
+           requirement: lead.requirement || null,
+           employeeName: lead.generatedBy || "N/A", // Map generatedBy to employeeName
+           status: lead.status || "N/A",
+           date: lead.date || new Date().toISOString().split("T")[0],
+           time: lead.time || "",
+           createdAt: lead.createdAt,
+           nfd: lead.nfd || null,
+           nfdUpdatedDay: lead.nfdUpdatedDay || null,
+         }));
 
         setLeads(mappedLeads);
         setError(null);
@@ -402,11 +404,17 @@ const Dashboard = ({ apiUrl }) => {
                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Business & Client
                   </th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
+                    Client Number
+                  </th>
                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden md:table-cell">
                     Business Type
                   </th>
                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
                     Location
+                  </th>
+                  <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider hidden lg:table-cell">
+                    Requirement
                   </th>
                   <th className="px-3 sm:px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Date
@@ -434,7 +442,7 @@ const Dashboard = ({ apiUrl }) => {
               <tbody className="bg-gray-50 divide-y divide-gray-200">
                 {filteredLeads.length === 0 ? (
                   <tr>
-                    <td colSpan="10" className="px-3 sm:px-6 py-12 text-center">
+                    <td colSpan="12" className="px-3 sm:px-6 py-12 text-center">
                       <p className="text-gray-500 text-sm">
                         No leads found matching the selected filters.
                       </p>
@@ -459,10 +467,17 @@ const Dashboard = ({ apiUrl }) => {
                               {lead.contactName || lead.clientName || "N/A"}
                             </div>
                             <div className="sm:hidden text-xs text-slate-500 mt-2 space-y-1">
+                              <div>Number: {lead.clientNumber || "N/A"}</div>
                               <div>Type: {lead.businessType || "N/A"}</div>
                               <div>Location: {lead.location || "N/A"}</div>
+                              <div>Requirement: {lead.requirement || "N/A"}</div>
                               <div>Employee: {lead.employeeName || "N/A"}</div>
                             </div>
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden lg:table-cell">
+                          <div className="text-xs sm:text-sm text-slate-700">
+                            {lead.clientNumber || "N/A"}
                           </div>
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden md:table-cell">
@@ -476,6 +491,11 @@ const Dashboard = ({ apiUrl }) => {
                             <span className="ml-2 text-xs sm:text-sm text-slate-600">
                               {lead.location || "N/A"}
                             </span>
+                          </div>
+                        </td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden lg:table-cell">
+                          <div className="text-xs sm:text-sm text-slate-700">
+                            {lead.requirement || "N/A"}
                           </div>
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">

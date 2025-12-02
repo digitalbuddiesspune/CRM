@@ -12,9 +12,19 @@ const ClientLeadSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    clientNumber:{
+      type: String,
+      required: false,
+      trim: true,
+    },
     location: {
       type: String,
       required: true,
+      trim: true,
+    },
+    requirement: {
+      type: String,
+      required: false,
       trim: true,
     },
     generatedBy: {
@@ -33,7 +43,7 @@ const ClientLeadSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ["Pending", "In Progress", "Completed", "Cancelled", "Approved", "Rejected"], // optional
+      enum: ['Pending', 'In Progress', 'Cancelled', 'Approved', 'Rejected', 'Not Interested', 'Follow Up', 'Busy', 'Call Later', 'Meeting Scheduled', 'Not Answering'], // optional
     },
     nfd: {
       type: String, // Next Follow Up Date

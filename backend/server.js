@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import connectDB from './config/db.js';
 import clientRouter from './routes/ClinetLeadRoute.js';
+import authRouter from './routes/AuthRoute.js';
 dotenv.config();
 
 // Connect to database
@@ -16,6 +17,7 @@ app.use(express.json());
 
 
 // Routes
+app.use('/api/v1/auth', authRouter);
 app.use('/api/v1', clientRouter);
 // Start server
 app.listen(PORT, () => {

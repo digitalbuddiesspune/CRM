@@ -4,8 +4,10 @@ import axios from 'axios';
 const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     clientName: '',
+    clientNumber: '',
     businessType: '',
     location: '',
+    requirement: '',
     generatedBy: '',
     status: 'Pending',
     date: new Date().toISOString().split('T')[0],
@@ -21,8 +23,10 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
     if (lead) {
       setFormData({
         clientName: lead.clientName || '',
+        clientNumber: lead.clientNumber || '',
         businessType: lead.businessType || '',
         location: lead.location || '',
+        requirement: lead.requirement || '',
         generatedBy: lead.generatedBy || '',
         status: lead.status || 'Pending',
         date: lead.date || new Date().toISOString().split('T')[0],
@@ -32,7 +36,20 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
     }
   }, [lead]);
 
-  const statusOptions = ['Pending', 'In Progress', 'Completed', 'Cancelled', 'Approved', 'Rejected'];
+  const statusOptions = [
+    'Pending',
+    'In Progress',
+    'Completed',
+    'Cancelled',
+    'Approved',
+    'Rejected',
+    'Not Interested',
+    'Follow Up',
+    'Busy',
+    'Call Later',
+    'Meeting Scheduled',
+    'Not Answering',
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -125,6 +142,21 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
             />
           </div>
 
+          {/* Client Number */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Number
+            </label>
+            <input
+              type="text"
+              name="clientNumber"
+              value={formData.clientNumber}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g., +91 98765 43210"
+            />
+          </div>
+
           {/* Business Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -154,6 +186,21 @@ const EditLeadForm = ({ apiUrl, lead, onClose, onSuccess }) => {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               placeholder="e.g., Mumbai, Maharashtra"
+            />
+          </div>
+
+          {/* Requirement */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Client Requirement
+            </label>
+            <input
+              type="text"
+              name="requirement"
+              value={formData.requirement}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              placeholder="e.g., Digital Marketing, Website Development, SEO Services, etc."
             />
           </div>
 

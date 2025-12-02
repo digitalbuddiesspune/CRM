@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import AddLeadForm from './AddLeadForm';
-import EditLeadForm from './EditLeadForm';
-import Footer from './Footer';
-import logoImage from '../assets/width_800.webp';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AddLeadForm from "./AddLeadForm";
+import EditLeadForm from "./EditLeadForm";
+import Footer from "./Footer";
+import logoImage from "../assets/width_800.webp";
 
-
-const Dashboard = ({ apiUrl }) => {
+const Dashboard = ({ apiUrl, user, onLogout }) => {
   const [leads, setLeads] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [stats, setStats] = useState(null);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState("");
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState('grouped'); // 'grouped' or 'list'
+  const [viewMode, setViewMode] = useState("grouped"); // 'grouped' or 'list'
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingLead, setEditingLead] = useState(null);
 
@@ -31,7 +30,7 @@ const Dashboard = ({ apiUrl }) => {
   };
 
   const handleDeleteLead = async (leadId) => {
-    if (!window.confirm('Are you sure you want to delete this lead?')) {
+    if (!window.confirm("Are you sure you want to delete this lead?")) {
       return;
     }
 
@@ -39,19 +38,19 @@ const Dashboard = ({ apiUrl }) => {
       await axios.delete(`${apiUrl}/delete-client-lead/${leadId}`);
       fetchData(); // Refresh data after deleting
     } catch (error) {
-      console.error('Error deleting lead:', error);
-      alert('Failed to delete lead. Please try again.');
+      console.error("Error deleting lead:", error);
+      alert("Failed to delete lead. Please try again.");
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch {
       return dateString;
@@ -62,42 +61,50 @@ const Dashboard = ({ apiUrl }) => {
     try {
       setLoading(true);
       const leadsRes = await axios.get(`${apiUrl}/get-all-leads`);
-      
+
       // Handle the API response structure: { success, count, data }
       if (leadsRes.data.success && leadsRes.data.data) {
         let filteredLeads = leadsRes.data.data;
-        
+
         // Filter by date if provided
         if (selectedDate) {
-          filteredLeads = filteredLeads.filter(lead => lead.date === selectedDate);
+          filteredLeads = filteredLeads.filter(
+            (lead) => lead.date === selectedDate
+          );
         }
-        
+
         // Filter by employee if provided
         if (selectedEmployee) {
-          filteredLeads = filteredLeads.filter(lead => lead.generatedBy === selectedEmployee);
+          filteredLeads = filteredLeads.filter(
+            (lead) => lead.generatedBy === selectedEmployee
+          );
         }
-        
+
         setLeads(filteredLeads);
-        
+
         // Get unique employees from leads
-        const uniqueEmployees = [...new Set(filteredLeads.map(lead => lead.generatedBy))];
-        setEmployees(uniqueEmployees.map((name, index) => ({ id: index + 1, name })));
-        
+        const uniqueEmployees = [
+          ...new Set(filteredLeads.map((lead) => lead.generatedBy)),
+        ];
+        setEmployees(
+          uniqueEmployees.map((name, index) => ({ id: index + 1, name }))
+        );
+
         // Calculate stats
         const totalLeads = filteredLeads.length;
         const leadsByEmployee = uniqueEmployees.map((name, index) => ({
           employeeId: index + 1,
           employeeName: name,
-          count: filteredLeads.filter(l => l.generatedBy === name).length
+          count: filteredLeads.filter((l) => l.generatedBy === name).length,
         }));
-        
+
         setStats({
           totalLeads,
-          leadsByEmployee
+          leadsByEmployee,
         });
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
@@ -114,37 +121,39 @@ const Dashboard = ({ apiUrl }) => {
 
   // Group leads by employee and date
   const leadsByEmployeeAndDate = leads.reduce((acc, lead) => {
-    const employeeName = lead.generatedBy || 'Unknown';
+    const employeeName = lead.generatedBy || "Unknown";
     const key = `${employeeName}-${lead.date}`;
     if (!acc[key]) {
       acc[key] = {
         employeeName: employeeName,
         date: lead.date,
-        leads: []
+        leads: [],
       };
     }
     acc[key].leads.push(lead);
     return acc;
   }, {});
 
-  const sortedDates = Object.keys(leadsByDate).sort((a, b) => new Date(b) - new Date(a));
+  const sortedDates = Object.keys(leadsByDate).sort(
+    (a, b) => new Date(b) - new Date(a)
+  );
 
   const getStatusColor = (status) => {
     const colors = {
-      'Approved': 'bg-green-100 text-green-800 border-green-300',
-      'Rejected': 'bg-red-100 text-red-800 border-red-300',
-      'In Progress': 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      'Pending': 'bg-blue-100 text-blue-800 border-blue-300',
-      'Completed': 'bg-emerald-100 text-emerald-800 border-emerald-300',
-      'Cancelled': 'bg-gray-100 text-gray-800 border-gray-300',
+      Approved: "bg-green-100 text-green-800 border-green-300",
+      Rejected: "bg-red-100 text-red-800 border-red-300",
+      "In Progress": "bg-yellow-100 text-yellow-800 border-yellow-300",
+      Pending: "bg-blue-100 text-blue-800 border-blue-300",
+      Completed: "bg-emerald-100 text-emerald-800 border-emerald-300",
+      Cancelled: "bg-gray-100 text-gray-800 border-gray-300",
       // Legacy statuses for backward compatibility
-      'New': 'bg-blue-100 text-blue-800 border-blue-300',
-      'Contacted': 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      'Qualified': 'bg-green-100 text-green-800 border-green-300',
-      'Converted': 'bg-purple-100 text-purple-800 border-purple-300',
-      'Lost': 'bg-red-100 text-red-800 border-red-300'
+      New: "bg-blue-100 text-blue-800 border-blue-300",
+      Contacted: "bg-yellow-100 text-yellow-800 border-yellow-300",
+      Qualified: "bg-green-100 text-green-800 border-green-300",
+      Converted: "bg-purple-100 text-purple-800 border-purple-300",
+      Lost: "bg-red-100 text-red-800 border-red-300",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
+    return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
   };
 
   if (loading) {
@@ -162,25 +171,73 @@ const Dashboard = ({ apiUrl }) => {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-              <img 
-                src={logoImage} 
-                alt="Digital Buddiess Logo" 
+              <img
+                src={logoImage}
+                alt="Digital Buddiess Logo"
                 className="h-10 sm:h-12 w-auto object-contain flex-shrink-0"
               />
               <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">CRM Dashboard</h1>
-                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-blue-100 font-medium">Digital Buddiess - Leads Management</p>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+                  CRM Dashboard
+                </h1>
+                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-blue-100 font-medium">
+                  Digital Buddiess - Leads Management
+                </p>
               </div>
             </div>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-white bg-opacity-20 backdrop-blur-sm text-black sm:text-black hover:cursor-pointer hover:translate-y-[-2px] rounded-md hover:bg-opacity-30 transition-colors font-medium shadow-sm flex items-center justify-center space-x-2 border border-white border-opacity-30"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span className="text-sm sm:text-base">Add Lead</span>
-            </button>
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {user && (
+                <div className="flex items-center space-x-2 text-white text-sm">
+                  <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-semibold">
+                      {user.username?.charAt(0).toUpperCase() || "U"}
+                    </span>
+                  </div>
+                  <span className="hidden sm:inline">{user.username}</span>
+                </div>
+              )}
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-white bg-opacity-20 backdrop-blur-sm text-black sm:text-black hover:cursor-pointer hover:translate-y-[-2px] rounded-md hover:bg-opacity-30 transition-colors font-medium shadow-sm flex items-center justify-center space-x-2 border border-white border-opacity-30"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                <span className="text-sm sm:text-base">Add Lead</span>
+              </button>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-red-500 bg-opacity-80 backdrop-blur-sm text-white hover:bg-opacity-100 hover:cursor-pointer hover:translate-y-[-2px] rounded-md transition-colors font-medium shadow-sm flex items-center justify-center space-x-2 border border-red-400 border-opacity-50"
+                  title="Logout"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  <span className="text-sm sm:text-base hidden sm:inline">Logout</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -190,14 +247,27 @@ const Dashboard = ({ apiUrl }) => {
         {stats && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div className="bg-gray-100 rounded-lg shadow p-6 border border-gray-200">
-              <div className="text-sm font-medium text-gray-600">Total Leads</div>
-              <div className="mt-2 text-3xl font-bold text-gray-800">{stats.totalLeads}</div>
+              <div className="text-sm font-medium text-gray-600">
+                Total Leads
+              </div>
+              <div className="mt-2 text-3xl font-bold text-gray-800">
+                {stats.totalLeads}
+              </div>
             </div>
             {stats.leadsByEmployee.map((emp) => (
-              <div key={emp.employeeId} className="bg-gray-100 rounded-lg shadow p-6 border border-gray-200">
-                <div className="text-sm font-medium text-gray-600">{emp.employeeName}</div>
-                <div className="mt-2 text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">{emp.count}</div>
-                <div className="mt-1 text-xs text-gray-500">leads generated</div>
+              <div
+                key={emp.employeeId}
+                className="bg-gray-100 rounded-lg shadow p-6 border border-gray-200"
+              >
+                <div className="text-sm font-medium text-gray-600">
+                  {emp.employeeName}
+                </div>
+                <div className="mt-2 text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  {emp.count}
+                </div>
+                <div className="mt-1 text-xs text-gray-500">
+                  leads generated
+                </div>
               </div>
             ))}
           </div>
@@ -251,8 +321,8 @@ const Dashboard = ({ apiUrl }) => {
           {(selectedDate || selectedEmployee) && (
             <button
               onClick={() => {
-                setSelectedDate('');
-                setSelectedEmployee('');
+                setSelectedDate("");
+                setSelectedEmployee("");
               }}
               className="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition"
             >
@@ -262,17 +332,19 @@ const Dashboard = ({ apiUrl }) => {
         </div>
 
         {/* Leads Display */}
-        {viewMode === 'grouped' ? (
+        {viewMode === "grouped" ? (
           <div className="space-y-6">
             {sortedDates.length === 0 ? (
               <div className="bg-gray-50 rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">No leads found for the selected filters.</p>
+                <p className="text-gray-500">
+                  No leads found for the selected filters.
+                </p>
               </div>
             ) : (
               sortedDates.map((date) => {
                 const dateLeads = leadsByDate[date];
                 const employeeGroups = dateLeads.reduce((acc, lead) => {
-                  const employeeName = lead.generatedBy || 'Unknown';
+                  const employeeName = lead.generatedBy || "Unknown";
                   if (!acc[employeeName]) {
                     acc[employeeName] = [];
                   }
@@ -281,62 +353,89 @@ const Dashboard = ({ apiUrl }) => {
                 }, {});
 
                 return (
-                  <div key={date} className="bg-gray-50 rounded-lg shadow overflow-hidden">
+                  <div
+                    key={date}
+                    className="bg-gray-50 rounded-lg shadow overflow-hidden"
+                  >
                     <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-4 sm:px-6 py-3 sm:py-4">
                       <h2 className="text-lg sm:text-xl font-bold text-white">
-                        {new Date(date).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
+                        {new Date(date).toLocaleDateString("en-US", {
+                          weekday: "long",
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
                         })}
                       </h2>
                       <p className="text-blue-100 mt-1 text-sm sm:text-base">
-                        {dateLeads.length} lead{dateLeads.length !== 1 ? 's' : ''} generated
+                        {dateLeads.length} lead
+                        {dateLeads.length !== 1 ? "s" : ""} generated
                       </p>
                     </div>
 
                     <div className="p-4 sm:p-6">
-                      {Object.entries(employeeGroups).map(([employeeName, empLeads]) => (
-                        <div key={employeeName} className="mb-6 last:mb-0">
-                          <div className="flex items-center mb-4 pb-2 border-b">
-                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                              <span className="text-blue-600 font-semibold">
-                                {employeeName.split(' ').map(n => n[0]).join('')}
-                              </span>
+                      {Object.entries(employeeGroups).map(
+                        ([employeeName, empLeads]) => (
+                          <div key={employeeName} className="mb-6 last:mb-0">
+                            <div className="flex items-center mb-4 pb-2 border-b">
+                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <span className="text-blue-600 font-semibold">
+                                  {employeeName
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </span>
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-gray-900">
+                                  {employeeName}
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                  {empLeads.length} lead
+                                  {empLeads.length !== 1 ? "s" : ""}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-gray-900">{employeeName}</h3>
-                              <p className="text-sm text-gray-500">
-                                {empLeads.length} lead{empLeads.length !== 1 ? 's' : ''}
-                              </p>
-                            </div>
-                          </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                            {empLeads.map((lead) => (
-                              <div
-                                key={lead._id || lead.id}
-                                className="bg-gray-100 border border-gray-300 rounded-lg p-3 sm:p-4 hover:shadow-md transition relative"
-                              >
-                                <div className="flex items-start justify-between mb-2 gap-2">
-                                  <h4 className="font-semibold text-gray-900 text-sm sm:text-base flex-1 break-words">{lead.clientName || 'N/A'}</h4>
-                                  <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
-                                    <span className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(lead.status)}`}>
-                                      {lead.status}
-                                    </span>
-                                    {/* Edit Button */}
-                                    <button
-                                      onClick={() => setEditingLead(lead)}
-                                      className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
-                                      title="Edit Lead"
-                                    >
-                                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                      </svg>
-                                    </button>
-                                    {/* Delete Button */}
-                                    <button
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                              {empLeads.map((lead) => (
+                                <div
+                                  key={lead._id || lead.id}
+                                  className="bg-gray-100 border border-gray-300 rounded-lg p-3 sm:p-4 hover:shadow-md transition relative"
+                                >
+                                  <div className="flex items-start justify-between mb-2 gap-2">
+                                    <h4 className="font-semibold text-gray-900 text-sm sm:text-base flex-1 break-words">
+                                      {lead.clientName || "N/A"}
+                                    </h4>
+                                    <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
+                                      <span
+                                        className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(
+                                          lead.status
+                                        )}`}
+                                      >
+                                        {lead.status}
+                                      </span>
+                                      {/* Edit Button */}
+                                      <button
+                                        onClick={() => setEditingLead(lead)}
+                                        className="p-1 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                        title="Edit Lead"
+                                      >
+                                        <svg
+                                          className="w-5 h-5"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                          />
+                                        </svg>
+                                      </button>
+                                      {/* Delete Button */}
+                                      {/* <button
                                       onClick={() => handleDeleteLead(lead._id || lead.id)}
                                       className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                                       title="Delete Lead"
@@ -344,26 +443,69 @@ const Dashboard = ({ apiUrl }) => {
                                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                       </svg>
-                                    </button>
+                                    </button> */}
+                                    </div>
+                                  </div>
+                                  <div className="space-y-1 text-sm text-gray-600">
+                                    {lead.clientNumber && (
+                                      <p>
+                                        <span className="font-medium">
+                                          Client Number:
+                                        </span>{" "}
+                                        {lead.clientNumber}
+                                      </p>
+                                    )}
+                                    <p>
+                                      <span className="font-medium">
+                                        Business Type:
+                                      </span>{" "}
+                                      {lead.businessType || "N/A"}
+                                    </p>
+                                    <p>
+                                      <span className="font-medium">
+                                        Location:
+                                      </span>{" "}
+                                      {lead.location || "N/A"}
+                                    </p>
+                                    {lead.requirement && (
+                                      <p>
+                                        <span className="font-medium">
+                                          Requirement:
+                                        </span>{" "}
+                                        {lead.requirement}
+                                      </p>
+                                    )}
+                                    <p>
+                                      <span className="font-medium">Date:</span>{" "}
+                                      {lead.date || "N/A"}
+                                    </p>
+                                    <p>
+                                      <span className="font-medium">Time:</span>{" "}
+                                      {lead.time || "N/A"}
+                                    </p>
+                                    {lead.nfd && (
+                                      <p>
+                                        <span className="font-medium">
+                                          NFD:
+                                        </span>{" "}
+                                        {formatDate(lead.nfd)}
+                                      </p>
+                                    )}
+                                    {lead.nfdUpdatedDay && (
+                                      <p>
+                                        <span className="font-medium">
+                                          NFD Updated:
+                                        </span>{" "}
+                                        {formatDate(lead.nfdUpdatedDay)}
+                                      </p>
+                                    )}
                                   </div>
                                 </div>
-                                <div className="space-y-1 text-sm text-gray-600">
-                                  <p><span className="font-medium">Business Type:</span> {lead.businessType || 'N/A'}</p>
-                                  <p><span className="font-medium">Location:</span> {lead.location || 'N/A'}</p>
-                                  <p><span className="font-medium">Date:</span> {lead.date || 'N/A'}</p>
-                                  <p><span className="font-medium">Time:</span> {lead.time || 'N/A'}</p>
-                                  {lead.nfd && (
-                                    <p><span className="font-medium">NFD:</span> {formatDate(lead.nfd)}</p>
-                                  )}
-                                  {lead.nfdUpdatedDay && (
-                                    <p><span className="font-medium">NFD Updated:</span> {formatDate(lead.nfdUpdatedDay)}</p>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      )}
                     </div>
                   </div>
                 );
@@ -385,11 +527,17 @@ const Dashboard = ({ apiUrl }) => {
                     <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Company
                     </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                      Client Number
+                    </th>
                     <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                       Business Type
                     </th>
                     <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                       Location
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                      Requirement
                     </th>
                     <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                       Time
@@ -411,7 +559,10 @@ const Dashboard = ({ apiUrl }) => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {leads.length === 0 ? (
                     <tr>
-                      <td colSpan="10" className="px-3 sm:px-6 py-4 text-center text-gray-500 text-sm">
+                      <td
+                        colSpan="12"
+                        className="px-3 sm:px-6 py-4 text-center text-gray-500 text-sm"
+                      >
                         No leads found
                       </td>
                     </tr>
@@ -419,41 +570,64 @@ const Dashboard = ({ apiUrl }) => {
                     leads
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .map((lead) => (
-                        <tr key={lead._id || lead.id} className="hover:bg-gray-50">
+                        <tr
+                          key={lead._id || lead.id}
+                          className="hover:bg-gray-50"
+                        >
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
-                            <div className="sm:hidden font-medium mb-1">Date:</div>
+                            <div className="sm:hidden font-medium mb-1">
+                              Date:
+                            </div>
                             {new Date(lead.date).toLocaleDateString()}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-900 hidden sm:table-cell">
-                            {lead.generatedBy || 'N/A'}
+                            {lead.generatedBy || "N/A"}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
-                            <div className="sm:hidden font-medium mb-1">Company:</div>
-                            {lead.clientName || 'N/A'}
+                            <div className="sm:hidden font-medium mb-1">
+                              Company:
+                            </div>
+                            {lead.clientName || "N/A"}
                             <div className="sm:hidden text-xs text-gray-500 mt-1 space-y-1">
-                              <div>Employee: {lead.generatedBy || 'N/A'}</div>
-                              <div>Type: {lead.businessType || 'N/A'}</div>
+                              <div>Employee: {lead.generatedBy || "N/A"}</div>
+                              <div>Number: {lead.clientNumber || "N/A"}</div>
+                              <div>Type: {lead.businessType || "N/A"}</div>
+                              <div>
+                                Requirement: {lead.requirement || "N/A"}
+                              </div>
                             </div>
                           </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
+                            {lead.clientNumber || "N/A"}
+                          </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">
-                            {lead.businessType || 'N/A'}
+                            {lead.businessType || "N/A"}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
-                            {lead.location || 'N/A'}
+                            {lead.location || "N/A"}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
-                            {lead.time || 'N/A'}
+                            {lead.requirement || "N/A"}
+                          </td>
+                          <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
+                            {lead.time || "N/A"}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(lead.status)}`}>
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded border ${getStatusColor(
+                                lead.status
+                              )}`}
+                            >
                               {lead.status}
                             </span>
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden md:table-cell">
-                            {lead.nfd ? formatDate(lead.nfd) : 'N/A'}
+                            {lead.nfd ? formatDate(lead.nfd) : "N/A"}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
-                            {lead.nfdUpdatedDay ? formatDate(lead.nfdUpdatedDay) : 'N/A'}
+                            {lead.nfdUpdatedDay
+                              ? formatDate(lead.nfdUpdatedDay)
+                              : "N/A"}
                           </td>
                           <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex items-center space-x-1 sm:space-x-2">
@@ -462,11 +636,21 @@ const Dashboard = ({ apiUrl }) => {
                                 className="text-blue-600 hover:text-blue-900 p-1"
                                 title="Edit Lead"
                               >
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                <svg
+                                  className="w-4 h-4 sm:w-5 sm:h-5"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                                  />
                                 </svg>
                               </button>
-                              <button
+                              {/* <button
                                 onClick={() => handleDeleteLead(lead._id || lead.id)}
                                 className="text-red-600 hover:text-red-900 p-1"
                                 title="Delete Lead"
@@ -474,7 +658,7 @@ const Dashboard = ({ apiUrl }) => {
                                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
-                              </button>
+                              </button> */}
                             </div>
                           </td>
                         </tr>
@@ -512,4 +696,3 @@ const Dashboard = ({ apiUrl }) => {
 };
 
 export default Dashboard;
-
