@@ -5,7 +5,7 @@ import EditLeadForm from "./EditLeadForm";
 import Footer from "./Footer";
 import logoImage from "../assets/width_800.webp";
 
-const Dashboard = ({ apiUrl, user, onLogout }) => {
+const Dashboard = ({ apiUrl, user, onNavigateToProfile }) => {
   const [leads, setLeads] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [stats, setStats] = useState(null);
@@ -139,22 +139,29 @@ const Dashboard = ({ apiUrl, user, onLogout }) => {
   );
 
   const getStatusColor = (status) => {
-    const colors = {
-      Approved: "bg-green-100 text-green-800 border-green-300",
-      Rejected: "bg-red-100 text-red-800 border-red-300",
-      "In Progress": "bg-yellow-100 text-yellow-800 border-yellow-300",
-      Pending: "bg-blue-100 text-blue-800 border-blue-300",
-      Completed: "bg-emerald-100 text-emerald-800 border-emerald-300",
-      Cancelled: "bg-gray-100 text-gray-800 border-gray-300",
-      // Legacy statuses for backward compatibility
-      New: "bg-blue-100 text-blue-800 border-blue-300",
-      Contacted: "bg-yellow-100 text-yellow-800 border-yellow-300",
-      Qualified: "bg-green-100 text-green-800 border-green-300",
-      Converted: "bg-purple-100 text-purple-800 border-purple-300",
-      Lost: "bg-red-100 text-red-800 border-red-300",
-    };
-    return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
+  const colors = {
+    Pending: "bg-blue-100 text-blue-800 border-blue-300",
+    "In Progress": "bg-yellow-100 text-yellow-800 border-yellow-300",
+    Completed: "bg-emerald-100 text-emerald-800 border-emerald-300",
+    Cancelled: "bg-red-100 text-red-800 border-red-300",
+    Approved: "bg-green-100 text-green-800 border-green-300",
+    Rejected: "bg-rose-100 text-rose-800 border-rose-300",
+    "Not Interested": "bg-gray-100 text-gray-800 border-gray-300",
+    "Follow Up": "bg-indigo-100 text-indigo-800 border-indigo-300",
+    Busy: "bg-amber-100 text-amber-800 border-amber-300",
+    "Call Later": "bg-orange-100 text-orange-800 border-orange-300",
+    "Meeting Scheduled": "bg-purple-100 text-purple-800 border-purple-300",
+    "Not Answering": "bg-slate-100 text-slate-800 border-slate-300",
+
+    // Legacy statuses (if still in DB)
+    New: "bg-blue-100 text-blue-800 border-blue-300",
+    Contacted: "bg-yellow-100 text-yellow-800 border-yellow-300",
+    Qualified: "bg-green-100 text-green-800 border-green-300",
+    Converted: "bg-purple-100 text-purple-800 border-purple-300",
   };
+
+  return colors[status] || "bg-gray-100 text-gray-800 border-gray-300";
+};
 
   if (loading) {
     return (
@@ -176,29 +183,44 @@ const Dashboard = ({ apiUrl, user, onLogout }) => {
                 alt="Digital Buddiess Logo"
                 className="h-10 sm:h-12 w-auto object-contain flex-shrink-0"
               />
-              <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                  CRM Dashboard
-                </h1>
-                <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-blue-100 font-medium">
-                  Digital Buddiess - Leads Management
-                </p>
-              </div>
             </div>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-3 w-full sm:w-auto ">
               {user && (
-                <div className="flex items-center space-x-2 text-white text-sm">
-                  <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-semibold">
+                <button
+                  onClick={onNavigateToProfile}
+                  className="flex shadow-md items-center space-x-2 text-black text-sm bg-white hover:bg-opacity-10  rounded-lg px-3 py-1.5 transition-colors hover:cursor-pointer hover:-translate-y-0.5"
+                  title="View Profile"
+                >
+                  <div className="w-8 h-8 bg-slate-900 text-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <span className="text-xs lg:text-sm font-semibold">
                       {user.username?.charAt(0).toUpperCase() || "U"}
                     </span>
                   </div>
-                  <span className="hidden sm:inline">{user.username}</span>
-                </div>
+                  <span className="hidden sm:inline font-medium text-black">
+                    {user.username}
+                  </span>
+                  <svg
+                    className="w-4 h-4 hidden sm:inline"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
               )}
               <button
                 onClick={() => setShowAddForm(true)}
-                className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-white bg-opacity-20 backdrop-blur-sm text-black sm:text-black hover:cursor-pointer hover:translate-y-[-2px] rounded-md hover:bg-opacity-30 transition-colors font-medium shadow-sm flex items-center justify-center space-x-2 border border-white border-opacity-30"
+                className="w-full sm:w-auto px-4 sm:px-6 py-2
+  bg-[#2b2b2b] text-white
+  rounded-md shadow-sm border border-transparent
+  flex items-center justify-center space-x-2
+  transition-all hover:-translate-y-0.5 hover:bg-[#2b2b2b] hover:shadow-md"
               >
                 <svg
                   className="w-5 h-5"
@@ -213,30 +235,10 @@ const Dashboard = ({ apiUrl, user, onLogout }) => {
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                <span className="text-sm sm:text-base">Add Lead</span>
+                <span className="text-sm sm:text-base font-medium">
+                  Add Lead
+                </span>
               </button>
-              {onLogout && (
-                <button
-                  onClick={onLogout}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-red-500 bg-opacity-80 backdrop-blur-sm text-white hover:bg-opacity-100 hover:cursor-pointer hover:translate-y-[-2px] rounded-md transition-colors font-medium shadow-sm flex items-center justify-center space-x-2 border border-red-400 border-opacity-50"
-                  title="Logout"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                    />
-                  </svg>
-                  <span className="text-sm sm:text-base hidden sm:inline">Logout</span>
-                </button>
-              )}
             </div>
           </div>
         </div>

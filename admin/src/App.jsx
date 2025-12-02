@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
+import Signup from "./components/Signup";
+import Profile from "./components/Profile";
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -9,6 +11,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSignup, setShowSignup] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -61,6 +65,29 @@ function App() {
     setUser(null);
   };
 
+  const handleSignupSuccess = () => {
+    // After successful signup, redirect to login
+    setShowSignup(false);
+    // Optionally show a success message
+    alert("Registration successful! Please login with your credentials.");
+  };
+
+  const handleBackToLogin = () => {
+    setShowSignup(false);
+  };
+
+  const handleNavigateToSignup = () => {
+    setShowSignup(true);
+  };
+
+  const handleNavigateToProfile = () => {
+    setShowProfile(true);
+  };
+
+  const handleBackToDashboard = () => {
+    setShowProfile(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -73,12 +100,36 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
+    if (showSignup) {
+      return (
+        <Signup
+          onSignupSuccess={handleSignupSuccess}
+          onBackToLogin={handleBackToLogin}
+        />
+      );
+    }
+    return <Login onLogin={handleLogin} onNavigateToSignup={handleNavigateToSignup} />;
   }
 
+  // Show profile page if authenticated and profile is requested
+  if (showProfile) {
+    return (
+      <Profile
+        user={user}
+        onLogout={handleLogout}
+        onBack={handleBackToDashboard}
+      />
+    );
+  }
+
+  // Show dashboard
   return (
     <div className="min-h-screen bg-gray-50">
-      <Dashboard apiUrl={VITE_BACKEND_URL} user={user} onLogout={handleLogout} />
+      <Dashboard
+        apiUrl={VITE_BACKEND_URL}
+        user={user}
+        onNavigateToProfile={handleNavigateToProfile}
+      />
     </div>
   );
 }

@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import axios from "axios";
 import logoImage from "../assets/width_800.webp";
 
-const Login = ({ onLogin, onNavigateToSignup }) => {
+const Signup = ({ onSignupSuccess, onBackToLogin }) => {
   const [formData, setFormData] = useState({
+    username: "",
     email: "",
     password: "",
+    confirmPassword: "",
+    role: "admin",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,23 +28,39 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(false);
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
 
     try {
       const apiUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001/api/v1";
-      console.log("Attempting login to:", `${apiUrl}/auth/login`);
+      console.log("Attempting signup to:", `${apiUrl}/auth/register`);
       
-      const response = await axios.post(`${apiUrl}/auth/login`, formData);
+      // Remove confirmPassword before sending
+      const { confirmPassword, ...signupData } = formData;
+      
+      const response = await axios.post(`${apiUrl}/auth/register`, signupData);
 
       if (response.data.success) {
-        // Store token and user data in localStorage
-        localStorage.setItem("token", response.data.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.data.user));
-        
-        // Call onLogin callback to update parent component
-        onLogin(response.data.data);
+        setSuccess(true);
+        // Wait a moment to show success message, then redirect to login
+        setTimeout(() => {
+          onSignupSuccess && onSignupSuccess();
+        }, 2000);
       }
     } catch (err) {
-      console.error("Login error details:", {
+      console.error("Signup error details:", {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status,
@@ -48,19 +68,15 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
       });
       
       // More specific error messages
-      if (err.response?.status === 401) {
+      if (err.response?.status === 400) {
         setError(
-          err.response?.data?.message || "Invalid email or password. Please check your credentials."
-        );
-      } else if (err.response?.status === 400) {
-        setError(
-          err.response?.data?.message || "Please provide both email and password."
+          err.response?.data?.message || "Registration failed. Please check your information."
         );
       } else if (err.code === "ECONNREFUSED" || err.message.includes("Network Error")) {
         setError("Cannot connect to server. Please make sure the backend server is running.");
       } else {
         setError(
-          err.response?.data?.message || "Failed to login. Please try again."
+          err.response?.data?.message || "Failed to register. Please try again."
         );
       }
     } finally {
@@ -80,12 +96,19 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
               className="h-16 w-auto object-contain"
             />
           </div>
-          <h1 className="text-2xl font-bold text-white">Admin Login</h1>
+          <h1 className="text-2xl font-bold text-white">Admin Registration</h1>
           <p className="text-blue-100 mt-1 text-sm">Digital Buddiess - CRM System</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="p-8 space-y-5">
+          {/* Success Message */}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md text-sm">
+              Registration successful! Redirecting to login...
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md text-sm">
@@ -93,13 +116,35 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
             </div>
           )}
 
+          {/* Username */}
+          <div>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Username <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              minLength={3}
+              maxLength={30}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Enter your username"
+            />
+          </div>
+
           {/* Email */}
           <div>
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Email Address
+              Email Address <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -119,7 +164,7 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
               htmlFor="password"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Password
+              Password <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -128,15 +173,59 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
               value={formData.password}
               onChange={handleChange}
               required
+              minLength={6}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-              placeholder="Enter your password"
+              placeholder="Enter your password (min 6 characters)"
             />
+          </div>
+
+          {/* Confirm Password */}
+          <div>
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Confirm Password <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              minLength={6}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              placeholder="Confirm your password"
+            />
+          </div>
+
+          {/* Role */}
+          <div>
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Role <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+            >
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="employee">Employee</option>
+            </select>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || success}
             className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
           >
             {loading ? (
@@ -161,39 +250,24 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Logging in...
+                Registering...
               </span>
+            ) : success ? (
+              "Registration Successful!"
             ) : (
-              "Login"
+              "Register"
             )}
           </button>
 
-          {/* Signup Link */}
+          {/* Back to Login Link */}
           <div className="text-center pt-2">
-            <p className="text-sm text-gray-600 mb-2">
-              Don't have an account?{" "}
-              <button
-                type="button"
-                onClick={onNavigateToSignup}
-                className="text-blue-600 hover:text-blue-800 font-medium underline"
-              >
-                Sign Up
-              </button>
-            </p>
-          </div>
-
-          {/* Info Text */}
-          <div className="mt-4 space-y-2">
-            <p className="text-center text-xs text-gray-500">
-              Contact your administrator if you need access
-            </p>
-            {/* {process.env.NODE_ENV === 'development' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-xs text-blue-800">
-                <p className="font-semibold mb-1">Default Admin Credentials:</p>
-                <p>Email: admin@digitalbuddiess.com</p>
-                <p>Password: admin123</p>
-              </div>
-            )} */}
+            <button
+              type="button"
+              onClick={onBackToLogin}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              ← Back to Login
+            </button>
           </div>
         </form>
       </div>
@@ -201,5 +275,5 @@ const Login = ({ onLogin, onNavigateToSignup }) => {
   );
 };
 
-export default Login;
+export default Signup;
 

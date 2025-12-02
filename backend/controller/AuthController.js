@@ -82,10 +82,13 @@ export const login = async (req, res) => {
       });
     }
 
-    // Find user by email
-    const user = await User.findOne({ email });
+    // Find user by email (case-insensitive)
+    const user = await User.findOne({ 
+      email: { $regex: new RegExp(`^${email}$`, 'i') } 
+    });
 
     if (!user) {
+      console.log(`Login attempt failed: User not found with email: ${email}`);
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
@@ -104,6 +107,7 @@ export const login = async (req, res) => {
     const isPasswordValid = await user.comparePassword(password);
 
     if (!isPasswordValid) {
+      console.log(`Login attempt failed: Invalid password for email: ${email}`);
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
