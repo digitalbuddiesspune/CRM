@@ -11,7 +11,18 @@ connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://admin.dmcrms.in",
+    "https://dmcrms.in"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.options("*", cors());
+
 // Middleware
 app.use(express.json());
 
