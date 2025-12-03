@@ -19,3 +19,4 @@ authRouter.get("/me", authenticate, getCurrentUser);
 
 export default authRouter;
 
+
